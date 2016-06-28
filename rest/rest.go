@@ -27,20 +27,25 @@ type DeleteSupported interface {
 //   GET:  /path
 //   PUT:  /path/:id
 //   POST: /path/:id
-func CRUD(group *gin.RouterGroup, path string, resource interface{}) {
+func CRUD(group *gin.RouterGroup, path string, resource interface{}, handlers ...gin.HandlerFunc) {
 	if resource, ok := resource.(CreateSupported); ok {
-		group.POST(path, resource.CreateHandler)
+		res := append([]gin.HandlerFunc{resource.CreateHandler}, handlers...)
+		group.POST(path, res...)
 	}
 	if resource, ok := resource.(ListSupported); ok {
-		group.GET(path, resource.ListHandler)
+		res := append([]gin.HandlerFunc{resource.ListHandler}, handlers...)
+		group.GET(path, res...)
 	}
 	if resource, ok := resource.(TakeSupported); ok {
-		group.GET(path+"/:id", resource.TakeHandler)
+		res := append([]gin.HandlerFunc{resource.TakeHandler}, handlers...)
+		group.GET(path+"/:id", res...)
 	}
 	if resource, ok := resource.(UpdateSupported); ok {
-		group.PUT(path+"/:id", resource.UpdateHandler)
+		res := append([]gin.HandlerFunc{resource.UpdateHandler}, handlers...)
+		group.PUT(path+"/:id", res...)
 	}
 	if resource, ok := resource.(DeleteSupported); ok {
-		group.DELETE(path+"/:id", resource.DeleteHandler)
+		res := append([]gin.HandlerFunc{resource.DeleteHandler}, handlers...)
+		group.DELETE(path+"/:id", res...)
 	}
 }
